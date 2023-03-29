@@ -13,7 +13,7 @@
       "name": "Dead BOX/shop",
       "rpm": 205,
       "check_image": "esc.png",
-      "check_area": [526, 964, 553, 991],
+      "check_area": [531, 971, 540, 980],
       "pattern": [
         [0, 0]
       ]
@@ -22,7 +22,7 @@
       "name": "F1 auto",
       "rpm": 205,
       "check_image": "F1_auto.png",
-      "check_area": [1181, 707, 1210, 737],
+      "check_area": [1184, 713, 1194, 723],
       "pattern": [
         [0, 0]
       ]
@@ -31,7 +31,7 @@
       "name": "Menu",
       "rpm": 205,
       "check_image": "menu.png",
-      "check_area": [876, 980, 898, 1005],
+      "check_area": [889, 988, 899, 998],
       "pattern": [
         [0, 0]
       ]
@@ -40,7 +40,7 @@
       "name": "Reload",
       "rpm": 205,
       "check_image": "reload.png",
-      "check_area": [916, 618, 932, 634],
+      "check_area": [918, 619, 930, 631],
       "pattern": [
         [0, 0]
       ]
@@ -49,7 +49,7 @@
       "name": "Fast Reload",
       "rpm": 205,
       "check_image": "fast_reload.png",
-      "check_area": [890, 615, 914, 639],
+      "check_area": [896, 620, 906, 630],
       "pattern": [
         [0, 0]
       ]

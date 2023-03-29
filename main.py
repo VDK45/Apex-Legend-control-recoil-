@@ -455,14 +455,26 @@ def main():
 
 
 if __name__ == "__main__":
+    print("                       ")
+    print("                       ")
+    print("***************** ВАЖНО  ********************")
     print("Внимание: Только для английской версии")
-    print("Внимание: Чтобы overlay отображался играть в окне или без рамки (Не в польноэкраном режиме)")
     print("Внимание: Разрешение экрана только: 1920 × 1080")
+    print("Внимание: Стрелать только клавишей - (МИНУС)")
+    print("Внимание: Клавиша J для пометки врагов")
+    print("Внимание: Чтобы overlay отображался играть в окне или без рамки (Не в польноэкраном режиме)")
     print("Не закрывайте это окно!")
+    print("                       ")
+    print("                       ")
+    
+    print("***************** IMPORTANT  ********************")
     print("Attention: English version only")
-    print("Attention: To have the overlay displayed play in a window or without a border (Not in full screen mode)")
     print("Attention: Resolution screen only: 1920×1080")
+    print("Attention: Shoot only with the - (MINUS) button")
+    print("Attention: J key to ping enemies")
+    print("Attention: To have the overlay displayed play in a window or without a border (Not in full screen mode)")
     print("Don't close this window!")
+    
     main()
     run = False
     
