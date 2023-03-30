@@ -9,7 +9,7 @@ Attention to shoot only with the minus button
 
 -------------- HOW ITS WORKS: ------------  
 AUTO PING ENEMY:
-# PRESS E AND CLICK LEFT_MOUSE SHOOT ONLY (NOT PING ENEMY)
+# PRESS AND HOLD E THEN CLICK LEFT_MOUSE SHOOT ONLY (NOT PING ENEMY)
 This is in order not to disturb teammates during crafting or shoot Coco Bot
 	
 MOVING DURING IN SHOP:
