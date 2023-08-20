@@ -45,6 +45,7 @@ BUTTON_R = 0x52
 BUTTON_Z = 0xBB
 enemy = True
 b_enemy = True
+running = True
 
 EMPTY_WEAPONS_LIST = [
     {
@@ -264,7 +265,7 @@ def listen_lmb():
         # Press and hold E no ping enemy
         if win32api.GetAsyncKeyState(BUTTON_E):
             enemy = False
-            lmb_infinity = True
+            lmb_infinity = False
         # Press Q/G no ping enemy
         if win32api.GetAsyncKeyState(BUTTON_Q) \
                 or win32api.GetAsyncKeyState(BUTTON_Z) \
@@ -278,7 +279,8 @@ def listen_lmb():
                 or win32api.GetAsyncKeyState(R_MOUSE):
             b_enemy = True
         # Auto single shoot
-        if (win32api.GetAsyncKeyState(0x01) & 0x8000 > 0):
+        # if (win32api.GetAsyncKeyState(0x01) & 0x8000 > 0):
+        if is_lmb_pressed():
             lmb_pressing = True
             if enemy and gui.ENEMY and b_enemy:
                 # press J ping ENEMY HERE
@@ -299,15 +301,17 @@ def click_lmb():
             keyb_down(MINUS)
             time.sleep(0.01)
             keyb_up(MINUS)
+            mouse_move_relative(0, 19)
             time.sleep(0.01)
-            mouse_move_relative(0, 38)
+            mouse_move_relative(0, 19)
         elif lmb_pressing and not lmb_infinity:
             keyb_down(MINUS)
         else:
             keyb_up(MINUS)
+            
 
 
-def main():
+def main(running):
     global lmb_pressing
     global lmb_infinity
     global enemy
@@ -316,7 +320,7 @@ def main():
     f1_timer = True
     CYCLE_WEAPON = True
     SHOP = True
-    running = True
+    
     no_recoil = False
     weapons_list, current_weapon_index = load_weapons()
     overlay = OverlayLabel()
@@ -361,8 +365,8 @@ def main():
         construct_overlay(overlay, weapons_list, current_weapon_index, no_recoil)
         if is_lmb_pressed() and no_recoil and not cursor_detector() and not lmb_infinity and gui.RECOIL:
             process_no_recoil(overlay, weapons_list, current_weapon_index, no_recoil)
-            
-        # TAB menu 
+
+        # TAB menu
         if win32api.GetAsyncKeyState(TAB):
             no_recoil = False
         elif win32api.GetAsyncKeyState(ESC) \
@@ -400,7 +404,7 @@ def main():
             time.sleep(0.02)
             keyb_up(F1)
         # Auto press spaces in menu
-        elif current_weapon_index == 3:  # Menu 
+        elif current_weapon_index == 3:  # Menu
             lmb_infinity = False
             keyb_down(SPACE)
             time.sleep(0.2)
@@ -420,9 +424,9 @@ def main():
             keyb_up(BUTTON_R)
             b_enemy = True
         elif current_weapon_index == 4 and CYCLE_WEAPON and gui.RELOAD:  # Cycle weapon
+            CYCLE_WEAPON = False
             keyb_up(L_MOUSE)
             keyb_up(MINUS)
-            CYCLE_WEAPON = False
             keyb_down(BUTTON_L)
             time.sleep(0.01)
             keyb_up(BUTTON_L)
@@ -454,29 +458,26 @@ def main():
             current_weapon_index = 0
 
         # Press LMB no recoil ON
-        if mouse_1 != state_left:  # mouse 1 release 
+        if mouse_1 != state_left:  # mouse 1 release
             state_left = mouse_1
             if mouse_1 >= 0:
                 no_recoil = True
                 CYCLE_WEAPON = True
-                # current_weapon_index = 0 
+                # current_weapon_index = 0
+                
+        
 
         # P2020/G7 Scout/Hemlok/MASTIFF/Peacekeeper/
         # Prowler/P 30-30/Triple Take/ Infinity shots (auto single shot)
-        # if current_weapon_index == 36 and no_recoil and gui.SINGLE:
-            # lmb_infinity = True
-            # print('SHELA')
         if current_weapon_index == 0 and no_recoil:  # No weapon
-            lmb_infinity = False
-            enemy = False
-        elif current_weapon_index == 37 and no_recoil: # In craft
-            print('craft')
             lmb_infinity = False
             enemy = False
         elif current_weapon_index == 6 and no_recoil:  # Bocec
             lmb_infinity = False
-        elif current_weapon_index == 7 and no_recoil and gui.SINGLE \
-                or current_weapon_index == 8 and no_recoil and gui.SINGLE \
+        elif current_weapon_index == 7 and no_recoil:  # Charge Rifle
+            lmb_infinity = False
+        elif current_weapon_index == 8 and no_recoil and gui.SINGLE \
+                or current_weapon_index == 9 and no_recoil and gui.SINGLE \
                 or current_weapon_index == 14 and no_recoil and gui.SINGLE \
                 or current_weapon_index == 16 and no_recoil and gui.SINGLE \
                 or current_weapon_index == 21 and no_recoil and gui.SINGLE \
@@ -502,6 +503,9 @@ if __name__ == "__main__":
     print("Внимание: Чтобы overlay отображался играть в окне или без рамки (Не в польноэкраном режиме)")
     print("Не закрывайте это окно!")
     print("                       ")
+    print("----------------- КАК ИГРАТЬ: -----------------")
+    print(" Деражть E и стрелять - без метки врагов (Для крафта и стрелбы по КОКОБОТ) ")
+    print("                       ")
     print("                       ")
 
     print("***************** IMPORTANT  ********************")
@@ -511,6 +515,10 @@ if __name__ == "__main__":
     print("Attention: J key to ping enemies")
     print("Attention: To have the overlay displayed play in a window or without a border (Not in full screen mode)")
     print("Don't close this window!")
+    print("                       ")
+    print("----------------- HOW TO PLAY: -----------------")
+    print(" Hold E and shoot - unmarked enemies (For crafting and shooting at COCOBOTS) ")
+    print("                       ")
 
-    main()
+    main(running)
     run = False

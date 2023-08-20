@@ -27,9 +27,9 @@ def is_lmb_release():
 def listen_lmb():
     global flag
     while run:
-        time.sleep(0.01)
-        if (win32api.GetAsyncKeyState(0x01) & 0x8000 > 0):
-        # if is_lmb_pressed():
+        time.sleep(0.001)
+        # if (win32api.GetAsyncKeyState(0x01) & 0x8000 > 0):
+        if is_lmb_pressed():
             locker.acquire()
             flag = True
             locker.release()
