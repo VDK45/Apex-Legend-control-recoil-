@@ -18,12 +18,26 @@ import gui
 from pynput.mouse import Button, Controller
 import pyautogui
 
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 LMB = win32con.VK_LBUTTON
+RMB = win32con.VK_RBUTTON
 F4 = win32con.VK_F4
 F10 = win32con.VK_F10
 NUM_4 = win32con.VK_NUMPAD4
 NUM_6 = win32con.VK_NUMPAD6
 F1 = 0x70
+F2 = win32con.VK_F2
 L_MOUSE = 0x01
 R_MOUSE = 0x02
 TAB = 0x09
@@ -111,6 +125,22 @@ def is_lmb_pressed():
 
 def is_lmb_release():
     return win32api.GetKeyState(LMB) > 0
+
+
+def is_rmb_pressed():
+    return win32api.GetKeyState(RMB) < 0
+
+
+def is_rmb_release():
+    return win32api.GetKeyState(RMB) > 0
+
+
+def is_f2_pressed():
+    return win32api.GetKeyState(F2) < 0
+
+
+def is_f2_release():
+    return win32api.GetKeyState(F2) > 0
 
 
 def cursor_detector():
@@ -250,8 +280,8 @@ class WeaponDetectorThread(threading.Thread):
 run = True
 lmb_pressing = False
 mouse = Controller()
-# locker = threading.Lock()
 lmb_infinity = False
+SWITCH_WEAPON = False
 
 
 def listen_lmb():
@@ -260,8 +290,22 @@ def listen_lmb():
     global enemy
     global b_enemy
     enemy = False
+    global SWITCH_WEAPON
+
     while True:
         time.sleep(0.001)
+        # Press F2 == F1 отпустить нажать на М1
+        if is_f2_pressed():
+            # print("F2 pressed")
+            keyb_down(F1)
+            time.sleep(0.01)
+            keyb_up(F1)
+            time.sleep(0.300)
+            # f2_release = True
+            keyb_down(L_MOUSE)
+            time.sleep(0.1)
+            keyb_up(L_MOUSE)
+
         # Press and hold E no ping enemy
         if win32api.GetAsyncKeyState(BUTTON_E):
             enemy = False
@@ -269,25 +313,32 @@ def listen_lmb():
         # Press Q/G no ping enemy
         if win32api.GetAsyncKeyState(BUTTON_Q) \
                 or win32api.GetAsyncKeyState(BUTTON_Z) \
+                or win32api.GetAsyncKeyState(F1) \
+                or win32api.GetAsyncKeyState(BUTTON_E) \
                 or win32api.GetAsyncKeyState(BUTTON_G):
             b_enemy = False
             lmb_infinity = False
-        # Press 1/2 auto ping enemy
-        if win32api.GetAsyncKeyState(BUTTON_1) \
-                or win32api.GetAsyncKeyState(BUTTON_2) \
-                or win32api.GetAsyncKeyState(BUTTON_R) \
-                or win32api.GetAsyncKeyState(R_MOUSE):
+        # Press M2/1/2 auto ping enemy
+        if win32api.GetAsyncKeyState(R_MOUSE):
+            #  or win32api.GetAsyncKeyState(BUTTON_1) \
+            #  or win32api.GetAsyncKeyState(BUTTON_2) \
+            #  or win32api.GetAsyncKeyState(BUTTON_R) \
             b_enemy = True
         # Auto single shoot
-        # if (win32api.GetAsyncKeyState(0x01) & 0x8000 > 0):
+
+        # Hold RKM no switch weapon
+        if is_rmb_pressed():
+            SWITCH_WEAPON = False
+            # Hold LKM
         if is_lmb_pressed():
             lmb_pressing = True
+            # Ping enemy if RKM pressed
             if enemy and gui.ENEMY and b_enemy:
-                # press J ping ENEMY HERE
                 keyb_down(BUTTON_J)
                 time.sleep(0.01)
                 keyb_up(BUTTON_J)
                 enemy = False
+                SWITCH_WEAPON = True
         else:
             lmb_pressing = False
             enemy = True
@@ -295,6 +346,7 @@ def listen_lmb():
 
 def click_lmb():
     global lmb_pressing
+    global SWITCH_WEAPON
     while True:
         time.sleep(0.01)
         if lmb_pressing and lmb_infinity:
@@ -308,7 +360,13 @@ def click_lmb():
             keyb_down(MINUS)
         else:
             keyb_up(MINUS)
-            
+            # SWITCH WEAPON
+            if SWITCH_WEAPON == True:
+                keyb_down(BUTTON_L)
+                time.sleep(0.01)
+                keyb_up(BUTTON_L)
+                SWITCH_WEAPON = False
+                keyb_up(MINUS)
 
 
 def main(running):
@@ -320,7 +378,7 @@ def main(running):
     f1_timer = True
     CYCLE_WEAPON = True
     SHOP = True
-    
+
     no_recoil = False
     weapons_list, current_weapon_index = load_weapons()
     overlay = OverlayLabel()
@@ -343,9 +401,8 @@ def main(running):
 
     while running:
         time.sleep(0.001)
-        # weapon = current_weapon_index
 
-        # Press F10 EXIT / Press F10 toggle recoil
+        # Press F10 EXIT / Press F4 toggle recoil
         if win32api.GetAsyncKeyState(F10):
             running = not running
             beep_exit()
@@ -375,6 +432,7 @@ def main(running):
                 or win32api.GetAsyncKeyState(R_MOUSE):
             no_recoil = True
 
+        # SHOP / Dead box
         # In menu turn off infinity M1 / Dead box moving Left and Right
         # Press TAB / ESC / CTRL Stop moving L and R
         if win32api.GetAsyncKeyState(TAB) or \
@@ -403,6 +461,10 @@ def main(running):
             keyb_down(F1)
             time.sleep(0.02)
             keyb_up(F1)
+            time.sleep(0.500)
+            keyb_down(L_MOUSE)
+            time.sleep(0.1)
+            keyb_up(L_MOUSE)
         # Auto press spaces in menu
         elif current_weapon_index == 3:  # Menu
             lmb_infinity = False
@@ -439,15 +501,15 @@ def main(running):
             keyb_up(BUTTON_R)
             b_enemy = True
 
-        # Press G no recoil OFF
+        # Press G/E no recoil OFF
         mouse_1 = win32api.GetKeyState(L_MOUSE)
-        if win32api.GetKeyState(BUTTON_G) < 0:
+        if win32api.GetKeyState(BUTTON_G) < 0 or \
+                win32api.GetKeyState(BUTTON_E) < 0:
             no_recoil = False
         # Press 1/2/R/E no recoil ON
         elif win32api.GetKeyState(BUTTON_1) < 0 or \
                 win32api.GetKeyState(BUTTON_2) < 0 or \
-                win32api.GetKeyState(BUTTON_R) < 0 or \
-                win32api.GetKeyState(BUTTON_E) < 0:
+                win32api.GetKeyState(BUTTON_R) < 0:
             no_recoil = True
             is_lmb_release()
             keyb_up(L_MOUSE)
@@ -461,11 +523,9 @@ def main(running):
         if mouse_1 != state_left:  # mouse 1 release
             state_left = mouse_1
             if mouse_1 >= 0:
-                no_recoil = True
+                # no_recoil = True
                 CYCLE_WEAPON = True
                 # current_weapon_index = 0
-                
-        
 
         # P2020/G7 Scout/Hemlok/MASTIFF/Peacekeeper/
         # Prowler/P 30-30/Triple Take/ Infinity shots (auto single shot)

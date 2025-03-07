@@ -3,4 +3,3 @@ pip install opencv-python
 pip install Pillow
 pip install PyAutoGui
 pip install pynput
-
